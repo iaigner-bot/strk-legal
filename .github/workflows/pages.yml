@@ -1,0 +1,55 @@
+# Publish STRK's legal documents to GitHub Pages.
+#
+# App Store Connect and Google Play both require a publicly reachable privacy
+# policy URL; an in-app screen does not satisfy that.
+#
+# To enable: Settings -> Pages -> Build and deployment -> Source: GitHub Actions.
+
+name: Publish
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+      - run: node build.mjs
+      # This repository exists to publish two documents. Fail rather than
+      # deploy if anything else has found its way into the output.
+      - name: Assert only the legal pages are published
+        run: |
+          set -euo pipefail
+          found=$(find _site -type f | sort)
+          expected=$'_site/index.html\n_site/privacy-policy.html\n_site/terms-of-service.html'
+          if [ "$found" != "$expected" ]; then
+            echo "Refusing to publish. _site contains unexpected files:"; echo "$found"; exit 1
+          fi
+          echo "$found"
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4
