@@ -44,4 +44,4 @@ accept the revised terms.
 
 ## Contact
 
-Questions about these terms can be sent to **feedback@strk.app**.
+Questions about these terms can be sent to **support@strk.uk**.

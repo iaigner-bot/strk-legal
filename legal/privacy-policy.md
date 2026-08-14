@@ -84,4 +84,4 @@ account and data. It cannot be undone.
 
 ## Contact
 
-Questions about this policy can be sent to **feedback@strk.app**.
+Questions about this policy can be sent to **support@strk.uk**.
